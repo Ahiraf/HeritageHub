@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeritageHub | Seller Workspace</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="seller-page">
+
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="index.html">
+            <img src="images/logo.png" alt="HeritageHub logo">
+            <span>HeritageHub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html#hero">Home</a>
+            <a href="index.html#product-showcase">Products</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html">Profile</a>
+            <a href="seller.html" class="seller-link" data-role-link="SELLER">Seller Page</a>
+            <a href="orders.html">Orders</a>
+            <a href="reviews.html">Reviews</a>
+            <a href="bids.html">Bids</a>
+            <a href="account.html">Account</a>
+        </nav>
+    </div>
+</header>
+
+<section class="page-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container hero-content--center">
+        <p class="eyebrow">Dedicated to Sellers</p>
+        <h1>Seller Workspace</h1>
+        <p>Upload handcrafted products, manage your listings, and keep the HeritageHub catalogue fresh for eager buyers.</p>
+    </div>
+</section>
+
+<main class="section container">
+    <article class="panel">
+        <h2>List a New Product</h2>
+        <p>Add a craft to the HeritageHub catalogue. Provide your seller NID, product details, and optionally reference the approving admin.</p>
+        <p id="seller-access-message" class="form-feedback"></p>
+        <form id="product-form" class="stack">
+            <div class="form-row">
+                <label for="sellerNid">Seller NID*</label>
+                <input type="text" id="sellerNid" name="sellerNid" required>
+            </div>
+            <div class="form-row">
+                <label for="approvedById">Approving Admin ID</label>
+                <input type="number" id="approvedById" name="approvedById" min="1">
+            </div>
+            <div class="field-grid">
+                <label>Product Name*
+                    <input type="text" name="productName" required>
+                </label>
+                <label>Category*
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        <optgroup label="Textiles &amp; Weaving">
+                            <option value="Sarees">Sarees</option>
+                            <option value="Kamiz / Kurtis">Kamiz / Kurtis</option>
+                            <option value="Shawls & Scarves">Shawls &amp; Scarves</option>
+                            <option value="Shoes (Handmade)">Shoes (Handmade)</option>
+                            <option value="Embroidery & Handloom Items">Embroidery &amp; Handloom Items</option>
+                        </optgroup>
+                        <optgroup label="Pottery &amp; Ceramics">
+                            <option value="Earthenware">Earthenware</option>
+                            <option value="Decorative Ceramics">Decorative Ceramics</option>
+                        </optgroup>
+                        <optgroup label="Woodwork &amp; Bamboo">
+                            <option value="Bamboo Crafts">Bamboo Crafts</option>
+                            <option value="Wooden Decor">Wooden Decor</option>
+                        </optgroup>
+                        <optgroup label="Metal &amp; Stone Work">
+                            <option value="Brass Items">Brass Items</option>
+                            <option value="Stone Carvings">Stone Carvings</option>
+                        </optgroup>
+                        <optgroup label="Jewelry &amp; Ornaments">
+                            <option value="Traditional Jewelry">Traditional Jewelry</option>
+                            <option value="Filigree Jewelry">Filigree Jewelry</option>
+                        </optgroup>
+                        <optgroup label="Paintings &amp; Visual Arts">
+                            <option value="Canvas Art">Canvas Art</option>
+                            <option value="Scroll Paintings">Scroll Paintings</option>
+                        </optgroup>
+                        <optgroup label="Leather &amp; Natural Materials">
+                            <option value="Leather Crafts">Leather Crafts</option>
+                            <option value="Jute Crafts">Jute Crafts</option>
+                        </optgroup>
+                        <optgroup label="Handmade Home Decor">
+                            <option value="Wall Art">Wall Art</option>
+                            <option value="Table Decor">Table Decor</option>
+                        </optgroup>
+                        <optgroup label="Cultural &amp; Religious Crafts">
+                            <option value="Festival Decor">Festival Decor</option>
+                            <option value="Religious Items">Religious Items</option>
+                        </optgroup>
+                        <option value="Other Traditional Crafts">Other Traditional Crafts</option>
+                    </select>
+                </label>
+                <label>Material Type
+                    <input type="text" name="materialType" placeholder="e.g., Jute, Cotton">
+                </label>
+                <label>Sale Type
+                    <input type="text" name="saleType" placeholder="Fixed price or Made to order">
+                </label>
+                <label>Craft Type
+                    <input type="text" name="craftType" placeholder="Weaving, Pottery, etc.">
+                </label>
+                <label>Color
+                    <input type="text" name="color" placeholder="Primary color palette">
+                </label>
+                <label>Is Biddable*
+                    <select name="isBiddable" required>
+                        <option value="false" selected>Fixed price</option>
+                        <option value="true">Enable bidding</option>
+                    </select>
+                </label>
+                <label>Price (BDT)
+                    <input type="number" step="0.01" name="productPrice" placeholder="e.g., 3200">
+                </label>
+                <label>In Stock
+                    <input type="number" min="0" name="inStock" placeholder="Available quantity">
+                </label>
+                <label>Size
+                    <input type="text" name="size" placeholder="Dimensions or sizes">
+                </label>
+                <label>Weight
+                    <input type="text" name="weight" placeholder="e.g., 450g">
+                </label>
+                <label>Production Time
+                    <input type="text" name="productionTime" placeholder="e.g., 2 weeks">
+                </label>
+                <label>Image URL (optional)
+                    <input type="url" name="uploadImage" placeholder="https://">
+                </label>
+                <label>Upload Image
+                    <input type="file" name="imageFile" accept="image/*">
+                </label>
+            </div>
+            <label>Description
+                <textarea name="description" rows="3" placeholder="Highlight the story behind the craft."></textarea>
+            </label>
+            <button type="submit" class="btn primary">Save Product</button>
+            <p class="form-feedback" id="product-feedback"></p>
+        </form>
+    </article>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <span id="current-year"></span> HeritageHub. Crafted with pride for the artisans of Bangladesh.</p>
+    </div>
+</footer>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeritageHub | Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="index.html">
+            <img src="images/logo.png" alt="HeritageHub logo">
+            <span>HeritageHub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html#hero">Home</a>
+            <a href="index.html#product-showcase">Products</a>
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="profile.html">Profile</a>
+            <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
+            <a href="orders.html">Orders</a>
+            <a href="reviews.html">Reviews</a>
+            <a href="bids.html">Bids</a>
+            <a href="account.html">Account</a>
+        </nav>
+    </div>
+</header>
+
+<section class="page-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container hero-content--center">
+        <p class="eyebrow">Personalized Workspace</p>
+        <h1>Role-Based Dashboard</h1>
+        <p>Monitor your activities, track performance, and take action across HeritageHub. Your experience adapts to the role stored in your account.</p>
+    </div>
+</section>
+
+<main class="section container dashboard">
+    <p id="dashboard-feedback" class="auth-feedback"></p>
+
+    <section class="dashboard-section hidden" data-role="SELLER">
+        <header class="dashboard-header">
+            <h2>Seller Command Center</h2>
+            <p>Stay on top of your catalogue and monitor customer sentiment in real time.</p>
+        </header>
+        <div class="dashboard-grid">
+            <article class="dashboard-card">
+                <h3>Manage Products</h3>
+                <p>Review live listings, update descriptions, and publish new crafts directly from the console.</p>
+                <a class="btn subtle" href="seller.html">Open Seller Page</a>
+            </article>
+            <article class="dashboard-card">
+                <h3>Order Statistics</h3>
+                <ul>
+                    <li><span data-stat="orders-today">0</span> orders today</li>
+                    <li><span data-stat="orders-month">0</span> orders this month</li>
+                    <li>Top product: <span data-stat="top-product">N/A</span></li>
+                </ul>
+            </article>
+            <article class="dashboard-card">
+                <h3>Update Stock</h3>
+                <p>Sync inventory counts and schedule restocks for popular items.</p>
+                <button class="btn ghost" data-action="open-stock">Adjust Inventory</button>
+            </article>
+            <article class="dashboard-card">
+                <h3>Track Earnings</h3>
+                <ul>
+                    <li>Today: Tk <span data-stat="earnings-today">0.00</span></li>
+                    <li>This Month: Tk <span data-stat="earnings-month">0.00</span></li>
+                    <li>Payout Status: <span data-stat="payout-status">Pending</span></li>
+                </ul>
+            </article>
+            <article class="dashboard-card dashboard-card--wide">
+                <h3>Customer Feedback</h3>
+                <div class="dashboard-list" data-list="feedback">
+                    <p class="empty-state">No feedback yet. Encourage buyers to share their experience.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="dashboard-section hidden" data-role="CONSUMER">
+        <header class="dashboard-header">
+            <h2>Consumer Dashboard</h2>
+            <p>Track purchases, manage upcoming payments, and champion local artisans with thoughtful reviews.</p>
+        </header>
+        <div class="dashboard-grid">
+            <article class="dashboard-card">
+                <h3>Shopping Cart</h3>
+                <div class="dashboard-list" data-list="cart">
+                    <p class="empty-state">Your cart is empty. Add crafts from the marketplace to see them here.</p>
+                </div>
+                <button class="btn subtle" data-action="checkout-cart">Proceed to Checkout</button>
+            </article>
+            <article class="dashboard-card">
+                <h3>Order History</h3>
+                <div class="dashboard-list" data-list="orders">
+                    <p class="empty-state">No orders yet. Start shopping to view your history here.</p>
+                </div>
+            </article>
+            <article class="dashboard-card">
+                <h3>Manage Payments</h3>
+                <p>Update preferred payment method and review outstanding balances for custom orders.</p>
+                <button class="btn subtle" data-action="manage-payments">Open Payments</button>
+            </article>
+            <article class="dashboard-card">
+                <h3>Rate Artisans</h3>
+                <p>Share ratings and testimonials to highlight exceptional craftsmanship and service.</p>
+                <a class="btn ghost" href="reviews.html">Review Recent Purchases</a>
+            </article>
+        </div>
+    </section>
+
+    <section class="dashboard-section hidden" data-role="ADMIN">
+        <header class="dashboard-header">
+            <h2>Admin Control Panel</h2>
+            <p>Oversee platform health, ensure compliance, and keep the artisan community thriving.</p>
+        </header>
+        <div class="dashboard-grid">
+            <article class="dashboard-card">
+                <h3>User Oversight</h3>
+                <ul>
+                    <li>Total sellers: <span data-stat="seller-count">0</span></li>
+                    <li>Total consumers: <span data-stat="consumer-count">0</span></li>
+                    <li>Pending approvals: <span data-stat="pending-approvals">0</span></li>
+                </ul>
+            </article>
+            <article class="dashboard-card">
+                <h3>Verify Sellers</h3>
+                <div class="dashboard-list" data-list="seller-approvals">
+                    <p class="empty-state">All sellers are verified. New applications will appear here.</p>
+                </div>
+                <button class="btn subtle" data-action="open-approvals">Review Applications</button>
+            </article>
+            <article class="dashboard-card">
+                <h3>Listings & Complaints</h3>
+                <ul>
+                    <li>Listings awaiting review: <span data-stat="listing-queue">0</span></li>
+                    <li>Open complaints: <span data-stat="complaints-open">0</span></li>
+                </ul>
+                <button class="btn ghost" data-action="manage-complaints">Manage Complaints</button>
+            </article>
+            <article class="dashboard-card dashboard-card--wide">
+                <h3>System Analytics</h3>
+                <div class="dashboard-list" data-list="analytics">
+                    <p class="empty-state">Analytics integrations coming soon. Connect BI tooling to populate this area.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <span id="current-year"></span> HeritageHub. Empowering rural women.</p>
+    </div>
+</footer>
+
+<script src="js/dashboard.js" defer></script>
+</body>
+</html>
