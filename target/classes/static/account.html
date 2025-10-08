@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeritageHub | Account Access</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-body">
+
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="index.html">
+            <img src="images/logo.png" alt="HeritageHub logo">
+            <span>HeritageHub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html#hero">Home</a>
+            <a href="index.html#product-showcase">Products</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html">Profile</a>
+            <a href="index.html#mission">Our Story</a>
+            <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
+            <a href="account.html">Account</a>
+        </nav>
+    </div>
+</header>
+
+<section class="auth-hero">
+    <div class="auth-hero-content">
+        <p class="eyebrow">Join The Network</p>
+        <h1>Account Access</h1>
+        <p>Register as a new artisan or customer, or sign in to continue managing bids, orders, and transactions within HeritageHub.</p>
+    </div>
+</section>
+
+<main class="auth-wrapper">
+    <p class="auth-note">Accounts are linked to your national ID (NID). Returning users can sign in with the email and password used during registration.</p>
+
+    <div class="auth-grid">
+        <article class="auth-card">
+            <div>
+                <span class="tag">New members</span>
+                <h2>Create an account</h2>
+                <p>Set up your HeritageHub profile to list crafts, place bids, or purchase artisan products.</p>
+            </div>
+            <form id="register-form" class="stack">
+                <label>Registering as*
+                    <select name="role" id="register-role" required>
+                        <option value="CONSUMER" selected>Consumer</option>
+                        <option value="SELLER">Seller</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </label>
+                <label>Password*
+                    <input type="password" name="password" data-required="CONSUMER SELLER ADMIN" minlength="4">
+                </label>
+
+                <div class="field-grid role-section" data-role="CONSUMER">
+                    <label>Consumer NID*
+                        <input type="text" name="consumerNid" data-required="CONSUMER" placeholder="NID123456">
+                    </label>
+                    <label>Full Name*
+                        <input type="text" name="consumerName" data-required="CONSUMER" placeholder="Your name">
+                    </label>
+                    <label>Email*
+                        <input type="email" name="email" data-required="CONSUMER" placeholder="you@example.com">
+                    </label>
+                    <label>Phone
+                        <input type="tel" name="phoneNumber" placeholder="+8801XXXXXXXXX">
+                    </label>
+                    <label>Street / Holding
+                        <input type="text" name="street" placeholder="Holding or village">
+                    </label>
+                    <label>Union / Street Name
+                        <input type="text" name="streetName" placeholder="Street name">
+                    </label>
+                    <label>Street / House No.
+                        <input type="text" name="streetNo" placeholder="House or flat number">
+                    </label>
+                    <label>City / Upazila
+                        <input type="text" name="city" placeholder="City or Upazila">
+                    </label>
+                    <label>Postal Code
+                        <input type="text" name="codeNo" placeholder="0000">
+                    </label>
+                </div>
+
+                <div class="field-grid role-section hidden" data-role="SELLER">
+                    <label>Seller NID*
+                        <input type="text" name="sellerNid" data-required="SELLER" placeholder="Seller NID">
+                    </label>
+                    <label>Business / Craft Name*
+                        <input type="text" name="sellerName" data-required="SELLER" placeholder="Studio or craft name">
+                    </label>
+                    <label>Contact First Name
+                        <input type="text" name="sellerFirstName" placeholder="First name">
+                    </label>
+                    <label>Contact Last Name
+                        <input type="text" name="sellerLastName" placeholder="Last name">
+                    </label>
+                    <label>Email*
+                        <input type="email" name="email" data-required="SELLER" placeholder="you@example.com">
+                    </label>
+                    <label>Phone*
+                        <input type="tel" name="phoneNumber" data-required="SELLER" placeholder="+8801XXXXXXXXX">
+                    </label>
+                    <label>Working Type
+                        <input type="text" name="workingType" placeholder="E.g., Weaver, Potter">
+                    </label>
+                    <label>Village
+                        <input type="text" name="villageName" placeholder="Village">
+                    </label>
+                    <label>Union
+                        <input type="text" name="unionName" placeholder="Union">
+                    </label>
+                    <label>Upazila / City*
+                        <input type="text" name="city" data-required="SELLER CONSUMER" placeholder="City or Upazila">
+                    </label>
+                    <label>District*
+                        <input type="text" name="districtName" data-required="SELLER" placeholder="District">
+                    </label>
+                    <label>Division
+                        <input type="text" name="divisionName" placeholder="Division">
+                    </label>
+                    <label>Postal Code
+                        <input type="text" name="codeNo" placeholder="0000">
+                    </label>
+                    <label>Business Address
+                        <input type="text" name="street" placeholder="Workshop or address">
+                    </label>
+                    <label>Approving Admin ID
+                        <input type="number" name="managerId" min="1" placeholder="Optional admin ID for approval">
+                    </label>
+                </div>
+
+                <div class="field-grid role-section hidden" data-role="ADMIN">
+                    <label>Admin Name*
+                        <input type="text" name="adminName" data-required="ADMIN" placeholder="Full name">
+                    </label>
+                    <label>Email*
+                        <input type="email" name="email" data-required="ADMIN" placeholder="admin@example.com">
+                    </label>
+                    <label>Phone
+                        <input type="tel" name="phoneNumber" placeholder="+8801XXXXXXXXX">
+                    </label>
+                    <label>Role / Title
+                        <input type="text" name="adminRole" placeholder="E.g., Master Curator">
+                    </label>
+                </div>
+
+                <button type="submit" class="btn primary">Register</button>
+                <p id="register-feedback" class="auth-feedback"></p>
+            </form>
+        </article>
+
+        <article class="auth-card">
+            <div>
+                <span class="tag">Returning users</span>
+                <h2>Sign in</h2>
+                <p>Log in with your registered email to manage bids, track orders, and access your dashboard.</p>
+            </div>
+            <form id="login-form" class="stack">
+                <label>Role*
+                    <select name="role" id="login-role" required>
+                        <option value="CONSUMER" selected>Consumer</option>
+                        <option value="SELLER">Seller</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </label>
+                <label>Email*
+                    <input type="email" name="email" required placeholder="you@example.com">
+                </label>
+                <label>Password*
+                    <input type="password" name="password" required minlength="4">
+                </label>
+                <button type="submit" class="btn subtle">Login</button>
+                <p id="login-feedback" class="auth-feedback"></p>
+            </form>
+            <button type="button" class="link-button" id="forgot-password-trigger">Forgot password?</button>
+            <div id="forgot-password-panel" class="stack hidden">
+                <form id="forgot-password-form" class="stack">
+                    <h3>Request Reset Code</h3>
+                    <label>Role*
+                        <select name="role" required>
+                            <option value="CONSUMER" selected>Consumer</option>
+                            <option value="SELLER">Seller</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </label>
+                    <label>Email*
+                        <input type="email" name="email" required placeholder="you@example.com">
+                    </label>
+                    <button type="submit" class="btn subtle">Send Verification Code</button>
+                    <p id="forgot-password-feedback" class="auth-feedback"></p>
+                </form>
+                <form id="reset-password-form" class="stack">
+                    <h3>Reset Password</h3>
+                    <label>Role*
+                        <select name="role" required>
+                            <option value="CONSUMER" selected>Consumer</option>
+                            <option value="SELLER">Seller</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </label>
+                    <label>Email*
+                        <input type="email" name="email" required placeholder="you@example.com">
+                    </label>
+                    <label>Verification Code*
+                        <input type="text" name="code" required placeholder="Enter the 6-digit code">
+                    </label>
+                    <label>New Password*
+                        <input type="password" name="newPassword" required minlength="4" placeholder="Choose a new password">
+                    </label>
+                    <button type="submit" class="btn primary">Update Password</button>
+                    <p id="reset-password-feedback" class="auth-feedback"></p>
+                </form>
+            </div>
+            <p class="muted">After successful login you can continue using the admin console and API endpoints with your NID.</p>
+        </article>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <span id="current-year"></span> HeritageHub. Empowering rural women.</p>
+    </div>
+</footer>
+
+<script src="js/account.js" defer></script>
+</body>
+</html>

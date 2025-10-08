@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeritageHub | Share Review</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="index.html">
+            <img src="images/logo.png" alt="HeritageHub logo">
+            <span>HeritageHub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html#hero">Home</a>
+            <a href="index.html#product-showcase">Products</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html">Profile</a>
+            <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
+            <a href="orders.html">Orders</a>
+            <a href="reviews.html">Reviews</a>
+            <a href="bids.html">Bids</a>
+            <a href="account.html">Account</a>
+        </nav>
+    </div>
+</header>
+
+<section class="page-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container hero-content--center">
+        <p class="eyebrow">Community Voice</p>
+        <h1>Share a Review</h1>
+        <p>Collect feedback from consumers to highlight craftsmanship quality and boost artisan credibility.</p>
+    </div>
+</section>
+
+<main class="section container">
+    <article class="panel">
+        <h2>Review Details</h2>
+        <p>Submit a new review with rating and comments. Reviews appear alongside the product for buyers to read.</p>
+        <form id="review-form" class="stack">
+            <div class="field-grid">
+                <label>Consumer NID*
+                    <input type="text" name="consumerNid" required>
+                </label>
+                <label>Product ID*
+                    <input type="number" name="productId" min="1" required>
+                </label>
+                <label>Rating (1-5)
+                    <input type="number" name="rating" min="1" max="5" value="5">
+                </label>
+            </div>
+            <label>Comment
+                <textarea name="comment" rows="4" placeholder="Share your experience."></textarea>
+            </label>
+            <button type="submit" class="btn primary">Post Review</button>
+            <p class="form-feedback" id="review-feedback"></p>
+        </form>
+    </article>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <span id="current-year"></span> HeritageHub. Crafted with pride for the artisans of Bangladesh.</p>
+    </div>
+</footer>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>

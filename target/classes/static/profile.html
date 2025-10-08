@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeritageHub | Profile</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="profile-page">
+
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="index.html">
+            <img src="images/logo.png" alt="HeritageHub logo">
+            <span>HeritageHub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html#hero">Home</a>
+            <a href="index.html#product-showcase">Products</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html" class="active">Profile</a>
+            <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
+            <a href="orders.html">Orders</a>
+            <a href="reviews.html">Reviews</a>
+            <a href="bids.html">Bids</a>
+            <a href="account.html">Account</a>
+        </nav>
+    </div>
+</header>
+
+<section class="page-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container hero-content--center">
+        <p class="eyebrow">Your HeritageHub Identity</p>
+        <h1>Profile Overview</h1>
+        <p>Review the details you shared during registration. Keep your information current to build trust with artisans and buyers.</p>
+    </div>
+</section>
+
+<main class="section container">
+    <article class="panel">
+        <h2>Account Snapshot</h2>
+        <p id="profile-feedback" class="form-feedback"></p>
+        <div id="profile-content" class="profile-grid hidden"></div>
+    </article>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <span id="current-year"></span> HeritageHub. Empowering rural women.</p>
+    </div>
+</footer>
+
+<script src="js/app.js" defer></script>
+<script src="js/profile.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeritageHub | Artisans Marketplace</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="#hero">
+            <img src="images/logo.png" alt="HeritageHub logo">
+            <span>HeritageHub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html#hero">Home</a>
+            <a href="index.html#product-showcase">Products</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html">Profile</a>
+            <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
+            <a href="orders.html">Orders</a>
+            <a href="reviews.html">Reviews</a>
+            <a href="bids.html">Bids</a>
+            <a href="account.html">Account</a>
+        </nav>
+    </div>
+</header>
+
+<section id="hero" class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container">
+        <p class="eyebrow">Empowering Rural Women</p>
+        <h1>Artisan Creations, Timeless Heritage</h1>
+        <p>Discover handcrafted treasures rooted in tradition. Browse the marketplace below to explore the latest heritage crafts.</p>
+        <div class="hero-actions">
+            <a class="btn primary" href="#product-showcase">Explore Crafts</a>
+            <a class="btn ghost hidden seller-link" data-role-link="SELLER" href="seller.html">Sell with HeritageHub</a>
+        </div>
+    </div>
+</section>
+
+<main>
+    <section id="product-showcase" class="section container">
+        <div class="section-heading">
+            <div>
+                <h2>Marketplace Highlights</h2>
+                <p>Browse verified products curated and approved by our team of master artisans.</p>
+            </div>
+            <button id="refresh-products" class="btn subtle">Refresh Catalog</button>
+        </div>
+
+        <div id="product-grid" class="product-grid"></div>
+        <p id="product-empty-state" class="empty-state">No products found yet. Add one below or refresh the catalog.</p>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <span id="current-year"></span> HeritageHub. Crafted with pride for the artisans of Bangladesh.</p>
+    </div>
+</footer>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>
