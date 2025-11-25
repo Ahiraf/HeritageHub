@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HeritageHub | Place Bid</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="index.html">
+            <img src="images/logo.png" alt="HeritageHub logo">
+            <span>HeritageHub</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html#hero">Home</a>
+            <a href="index.html#product-showcase">Products</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html">Profile</a>
+            <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
+            <a href="orders.html">Orders</a>
+            <a href="reviews.html">Reviews</a>
+            <a href="account.html">Account</a>
+            <button type="button" class="nav-signout hidden" data-role-link="ANY" data-action="sign-out">Sign out</button>
+        </nav>
+    </div>
+</header>
+
+<section class="page-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container hero-content--center">
+        <p class="eyebrow">Competitive Offers</p>
+        <h1>Place a Bid</h1>
+        <p>Submit your best offer for selected artisan products. Keep an eye on the current top bid before you submit.</p>
+    </div>
+</section>
+
+<main class="section container">
+    <article class="panel">
+        <h2>Bid Details</h2>
+        <div id="bid-product-summary" class="product-summary">
+            <p class="empty-state">Loading product details…</p>
+        </div>
+    </article>
+
+    <article class="panel">
+        <h2>Place Your Bid</h2>
+        <form id="place-bid-form" class="stack">
+            <div class="field-grid">
+                <label>Product ID
+                    <input type="text" name="productId" id="bid-product-id" readonly>
+                </label>
+                <label>Consumer NID*
+                    <input type="text" name="consumerNid" id="bid-consumer-nid" required>
+                </label>
+                <label>Current Highest Bid
+                    <input type="text" name="currentBid" id="bid-current-amount" readonly>
+                </label>
+                <label>Your Bid Amount (Tk)*
+                    <input type="number" name="bidAmount" id="bid-amount" min="1" step="0.01" required>
+                </label>
+                <label>Bid Date
+                    <input type="datetime-local" name="bidDate" id="bid-date">
+                </label>
+                <label>Bid Status
+                    <input type="text" name="bidStatus" id="bid-status" placeholder="e.g., PENDING">
+                </label>
+            </div>
+            <button type="submit" class="btn primary">Submit Bid</button>
+            <p class="form-feedback" id="place-bid-feedback"></p>
+        </form>
+    </article>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <span id="current-year"></span> HeritageHub. Empowering rural women.</p>
+    </div>
+</footer>
+
+<script src="js/app.js" defer></script>
+<script src="js/place-bid.js" defer></script>
+</body>
+</html>

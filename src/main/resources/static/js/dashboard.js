@@ -9,12 +9,81 @@
         currentYearEl.textContent = new Date().getFullYear();
     }
 
-    const fetchJson = async (url) => {
-        const response = await fetch(url);
+    const fetchWithFallback = async (url, options = {}) => {
+        const bases = [];
+        const currentOrigin = new URL(window.location.href).origin;
+        bases.push(currentOrigin);
+        if (!currentOrigin.endsWith(":8080")) {
+            bases.push("http://localhost:8080");
+            bases.push("http://127.0.0.1:8080");
+        }
+        let lastError;
+        for (const base of bases) {
+            try {
+                const absolute = url.startsWith("http") ? url : `${base}${url}`;
+                const profile = getStoredProfile();
+                const apiKey = profile?.apiKey;
+                const headers = {
+                    "Content-Type": "application/json",
+                    ...(options.headers || {})
+                };
+                if (apiKey) {
+                    headers["X-API-KEY"] = apiKey;
+                }
+                const response = await fetch(absolute, {
+                    ...options,
+                    headers
+                });
+                return { response, absolute };
+            } catch (err) {
+                lastError = err;
+            }
+        }
+        if (lastError) {
+            throw lastError;
+        }
+        throw new Error("Unable to reach server");
+    };
+
+    const fetchJson = async (url, options = {}) => {
+        const { response } = await fetchWithFallback(url, options);
         if (!response.ok) {
-            throw new Error(response.statusText || "Request failed");
+            const body = await response.text();
+            let message = response.statusText;
+            try {
+                const parsed = JSON.parse(body);
+                message = parsed?.error || parsed?.message || message;
+            } catch {
+                // ignore
+            }
+            throw new Error(message || "Request failed");
         }
         return response.json();
+    };
+
+    const readStorageJson = (key) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) {
+            return null;
+        }
+        try {
+            return JSON.parse(raw);
+        } catch (err) {
+            console.warn("Failed to parse stored profile", err);
+            return null;
+        }
+    };
+
+    const getStoredProfile = () => {
+        return readStorageJson("heritagehubProfile") || readStorageJson("heritagehubSession");
+    };
+
+    const getAdminId = () => {
+        const profile = getStoredProfile();
+        if (!profile) {
+            return null;
+        }
+        return profile.adminId ?? profile.id ?? null;
     };
 
     const normalizeCartItems = (items = []) => {
@@ -61,6 +130,22 @@
         return normalized;
     };
 
+    const verifySeller = async (sellerNid, verified) => {
+        const adminId = getAdminId();
+        if (!adminId) {
+            alert("Sign in as an admin to verify sellers.");
+            return;
+        }
+        try {
+            await fetchJson(`/api/sellers/${encodeURIComponent(sellerNid)}/verify?adminId=${adminId}&verified=${verified}` , {
+                method: "POST"
+            });
+            await hydrateAdminCards();
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
     const adjustCartItem = (productId, delta) => {
         if (!productId) {
             return;
@@ -95,22 +180,7 @@
     };
 
     const detectRole = () => {
-        const sessionRaw = localStorage.getItem("heritagehubSession");
-        const profileRaw = localStorage.getItem("heritagehubProfile");
-        const parse = (raw) => {
-            if (!raw) return null;
-            try {
-                return JSON.parse(raw);
-            } catch (err) {
-                console.warn("Failed to parse stored profile", err);
-                return null;
-            }
-        };
-        const session = parse(sessionRaw);
-        if (session?.role) {
-            return session.role.toString().toUpperCase();
-        }
-        const profile = parse(profileRaw);
+        const profile = getStoredProfile();
         if (profile?.role) {
             return profile.role.toString().toUpperCase();
         }
@@ -191,11 +261,14 @@
             listingQueue: 0,
             complaints: 0
         };
+        let sellers = [];
+        let products = [];
+        let reviews = [];
         try {
-            const sellers = await fetchJson("/api/sellers");
+            sellers = await fetchJson("/api/sellers");
             if (Array.isArray(sellers)) {
                 counts.sellers = sellers.length;
-                counts.approvals = sellers.filter(seller => !seller.approvedBy).length;
+                counts.approvals = sellers.filter(seller => seller.verified === false || seller.verified === null).length;
             }
         } catch (err) {
             console.warn("Unable to load sellers", err);
@@ -209,12 +282,17 @@
             console.warn("Unable to load consumers", err);
         }
         try {
-            const products = await fetchJson("/api/products");
+            products = await fetchJson("/api/products");
             if (Array.isArray(products)) {
-                counts.listingQueue = products.filter(product => !product.approvedBy).length;
+                counts.listingQueue = products.filter(product => !product.approvedById).length;
             }
         } catch (err) {
             console.warn("Unable to load products", err);
+        }
+        try {
+            reviews = await fetchJson("/api/reviews");
+        } catch (err) {
+            console.warn("Unable to load reviews", err);
         }
 
         document.querySelector('[data-stat="seller-count"]')?.textContent = counts.sellers;
@@ -222,6 +300,9 @@
         document.querySelector('[data-stat="pending-approvals"]')?.textContent = counts.approvals;
         document.querySelector('[data-stat="listing-queue"]')?.textContent = counts.listingQueue;
         document.querySelector('[data-stat="complaints-open"]')?.textContent = counts.complaints;
+        renderSellerApprovals((sellers || []).filter(seller => !seller.verified));
+        renderPriceMonitor(products || []);
+        renderReviewMonitor(reviews || []);
     };
 
     const renderCart = () => {
@@ -269,6 +350,96 @@
         summary.className = "list-item cart-summary";
         summary.innerHTML = `<strong>Total: Tk ${total.toFixed(2)}</strong>`;
         container.appendChild(summary);
+    };
+
+    const renderSellerApprovals = (sellers = []) => {
+        const container = document.querySelector('[data-list="seller-approvals"]');
+        if (!container) {
+            return;
+        }
+        container.innerHTML = "";
+        if (!Array.isArray(sellers) || sellers.length === 0) {
+            container.innerHTML = "<p class=\"empty-state\">All sellers are verified.</p>";
+            return;
+        }
+        const adminId = getAdminId();
+        sellers.forEach(seller => {
+            const entry = document.createElement("div");
+            entry.className = "list-item";
+            entry.innerHTML = `
+                <strong>${seller.sellerName ?? seller.sellerNid}</strong>
+                <p class="meta">${seller.email ?? "No email"} • ${seller.upazilaName ?? "Unknown"}</p>
+                <div class="cart-controls">
+                    <button class="cart-btn" data-action="verify" data-seller="${seller.sellerNid}">Approve</button>
+                    <button class="cart-btn cart-remove" data-action="reject" data-seller="${seller.sellerNid}">Reject</button>
+                </div>
+            `;
+            container.appendChild(entry);
+        });
+        container.querySelectorAll("[data-action=\"verify\"]").forEach(button => {
+            button.addEventListener("click", async () => {
+                await verifySeller(button.dataset.seller, true);
+            });
+        });
+        container.querySelectorAll("[data-action=\"reject\"]").forEach(button => {
+            button.addEventListener("click", async () => {
+                await verifySeller(button.dataset.seller, false);
+            });
+        });
+        if (!adminId) {
+            container.insertAdjacentHTML("beforeend", "<p class=\"meta\">Sign in as an admin to enable verification.</p>");
+        }
+    };
+
+    const renderPriceMonitor = (products = []) => {
+        const container = document.querySelector('[data-list="price-monitor"]');
+        if (!container) {
+            return;
+        }
+        container.innerHTML = "";
+        if (!Array.isArray(products) || products.length === 0) {
+            container.innerHTML = "<p class=\"empty-state\">No products available yet.</p>";
+            return;
+        }
+        const sorted = products
+            .slice()
+            .filter(product => product.productPrice != null)
+            .sort((a, b) => Number(b.productPrice ?? 0) - Number(a.productPrice ?? 0))
+            .slice(0, 5);
+        sorted.forEach(product => {
+            const entry = document.createElement("div");
+            entry.className = "list-item";
+            entry.innerHTML = `
+                <strong>${product.productName ?? "Product"}</strong>
+                <p>Tk ${Number(product.productPrice ?? 0).toFixed(2)} • Seller ${product.sellerNid ?? "?"}</p>
+            `;
+            container.appendChild(entry);
+        });
+    };
+
+    const renderReviewMonitor = (reviews = []) => {
+        const container = document.querySelector('[data-list="review-monitor"]');
+        if (!container) {
+            return;
+        }
+        container.innerHTML = "";
+        if (!Array.isArray(reviews) || reviews.length === 0) {
+            container.innerHTML = "<p class=\"empty-state\">No reviews yet.</p>";
+            return;
+        }
+        reviews
+            .slice()
+            .sort((a, b) => new Date(b.reviewTime ?? 0) - new Date(a.reviewTime ?? 0))
+            .slice(0, 5)
+            .forEach(review => {
+                const entry = document.createElement("div");
+                entry.className = "list-item";
+                entry.innerHTML = `
+                    <strong>Product #${review.productId ?? "?"}</strong>
+                    <p>Rating: ${review.rating ?? "-"} • ${review.comment ?? "No comment"}</p>
+                `;
+                container.appendChild(entry);
+            });
     };
 
     const bindActions = () => {

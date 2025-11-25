@@ -1,5 +1,7 @@
 package com.HeritageHub.controller;
 
+import com.HeritageHub.dto.ProductResponse;
+import com.HeritageHub.mapper.ProductMapper;
 import com.HeritageHub.model.Product;
 import com.HeritageHub.service.ProductService;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -26,31 +29,31 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getProducts(@RequestParam(value = "category", required = false) String category) {
-        if (category != null && !category.isBlank()) {
-            return ResponseEntity.ok(productService.findByCategory(category));
-        }
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<List<ProductResponse>> getProducts(@RequestParam(value = "category", required = false) String category) {
+        List<Product> products = category != null && !category.isBlank()
+                ? productService.findByCategory(category)
+                : productService.findAll();
+        return ResponseEntity.ok(products.stream().map(ProductMapper::toResponse).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.findById(id));
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(ProductMapper.toResponse(productService.findById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product,
-                                                 @RequestParam("sellerNid") String sellerNid,
-                                                 @RequestParam(value = "approvedById", required = false) Long approvedById) {
-        return ResponseEntity.ok(productService.create(product, sellerNid, approvedById));
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody Product product,
+                                                         @RequestParam("sellerNid") String sellerNid,
+                                                         @RequestParam(value = "approvedById", required = false) Long approvedById) {
+        return ResponseEntity.ok(ProductMapper.toResponse(productService.create(product, sellerNid, approvedById)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id,
-                                                 @RequestBody Product product,
-                                                 @RequestParam(value = "sellerNid", required = false) String sellerNid,
-                                                 @RequestParam(value = "approvedById", required = false) Long approvedById) {
-        return ResponseEntity.ok(productService.update(id, product, sellerNid, approvedById));
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
+                                                         @RequestBody Product product,
+                                                         @RequestParam(value = "sellerNid", required = false) String sellerNid,
+                                                         @RequestParam(value = "approvedById", required = false) Long approvedById) {
+        return ResponseEntity.ok(ProductMapper.toResponse(productService.update(id, product, sellerNid, approvedById)));
     }
 
     @DeleteMapping("/{id}")

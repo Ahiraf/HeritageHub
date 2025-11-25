@@ -1,5 +1,7 @@
 package com.HeritageHub.controller;
 
+import com.HeritageHub.dto.ReviewResponse;
+import com.HeritageHub.mapper.ReviewMapper;
 import com.HeritageHub.model.Review;
 import com.HeritageHub.service.ReviewService;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -26,28 +29,26 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Review>> getReviews(@RequestParam(value = "productId", required = false) Long productId) {
-        if (productId != null) {
-            return ResponseEntity.ok(reviewService.findByProduct(productId));
-        }
-        return ResponseEntity.ok(reviewService.findAll());
+    public ResponseEntity<List<ReviewResponse>> getReviews(@RequestParam(value = "productId", required = false) Long productId) {
+        List<Review> reviews = productId != null ? reviewService.findByProduct(productId) : reviewService.findAll();
+        return ResponseEntity.ok(reviews.stream().map(ReviewMapper::toResponse).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReview(@PathVariable Long id) {
-        return ResponseEntity.ok(reviewService.findById(id));
+    public ResponseEntity<ReviewResponse> getReview(@PathVariable Long id) {
+        return ResponseEntity.ok(ReviewMapper.toResponse(reviewService.findById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody Review review,
+    public ResponseEntity<ReviewResponse> createReview(@RequestBody Review review,
                                                @RequestParam("consumerNid") String consumerNid,
                                                @RequestParam("productId") Long productId) {
-        return ResponseEntity.ok(reviewService.create(review, consumerNid, productId));
+        return ResponseEntity.ok(ReviewMapper.toResponse(reviewService.create(review, consumerNid, productId)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Review> updateReview(@PathVariable Long id, @RequestBody Review review) {
-        return ResponseEntity.ok(reviewService.update(id, review));
+    public ResponseEntity<ReviewResponse> updateReview(@PathVariable Long id, @RequestBody Review review) {
+        return ResponseEntity.ok(ReviewMapper.toResponse(reviewService.update(id, review)));
     }
 
     @DeleteMapping("/{id}")

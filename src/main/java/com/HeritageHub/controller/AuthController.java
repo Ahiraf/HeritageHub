@@ -48,6 +48,8 @@ public class AuthController {
                     Consumer consumer = new Consumer();
                     consumer.setConsumerNid(request.consumerNid());
                     consumer.setConsumerName(request.consumerName());
+                    consumer.setFirstName(request.consumerFirstName());
+                    consumer.setLastName(request.consumerLastName());
                     consumer.setEmail(request.email());
                     consumer.setPassword(request.password());
                     consumer.setPhoneNumber(request.phoneNumber());
@@ -79,16 +81,7 @@ public class AuthController {
                     Seller saved = sellerService.register(seller, request.managerId());
                     yield ResponseEntity.status(HttpStatus.CREATED).body(toSellerProfile(saved));
                 }
-                case ADMIN -> {
-                    Admin admin = new Admin();
-                    admin.setAdminName(request.adminName());
-                    admin.setEmail(request.email());
-                    admin.setPassword(request.password());
-                    admin.setPhoneNumber(request.phoneNumber());
-                    admin.setRole(request.adminRole());
-                    Admin saved = adminService.register(admin);
-                    yield ResponseEntity.status(HttpStatus.CREATED).body(toAdminProfile(saved));
-                }
+                case ADMIN -> throw new IllegalArgumentException("Admin accounts are invitation-only. Contact an existing admin for access.");
             };
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(errorPayload(ex.getMessage()));
@@ -190,6 +183,8 @@ public class AuthController {
         Map<String, Object> payload = new HashMap<>();
         payload.put("consumerNid", consumer.getConsumerNid());
         payload.put("consumerName", consumer.getConsumerName());
+        payload.put("consumerFirstName", consumer.getFirstName());
+        payload.put("consumerLastName", consumer.getLastName());
         payload.put("email", consumer.getEmail());
         payload.put("phoneNumber", consumer.getPhoneNumber());
         payload.put("street", consumer.getStreet());
@@ -197,6 +192,7 @@ public class AuthController {
         payload.put("streetName", consumer.getStreetName());
         payload.put("city", consumer.getCity());
         payload.put("codeNo", consumer.getCodeNo());
+        payload.put("apiKey", consumer.getApiKey());
         return payload;
     }
 
@@ -221,6 +217,7 @@ public class AuthController {
         payload.put("upazila", seller.getUpazilaName());
         payload.put("postCode", seller.getPostCode());
         payload.put("managerId", seller.getManager() != null ? seller.getManager().getId() : null);
+        payload.put("apiKey", seller.getApiKey());
         return payload;
     }
 
@@ -231,6 +228,7 @@ public class AuthController {
         payload.put("email", admin.getEmail());
         payload.put("phoneNumber", admin.getPhoneNumber());
         payload.put("role", admin.getRole());
+        payload.put("apiKey", admin.getApiKey());
         return payload;
     }
 
@@ -295,6 +293,8 @@ public class AuthController {
             String city,
             String consumerNid,
             String consumerName,
+            String consumerFirstName,
+            String consumerLastName,
             String street,
             String streetNo,
             String streetName,

@@ -94,6 +94,21 @@ img {
     color: var(--terracotta);
 }
 
+.nav-signout {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0;
+}
+
+.nav-signout:hover,
+.nav-signout:focus-visible {
+    color: var(--terracotta);
+}
+
 .hero {
     position: relative;
     min-height: clamp(420px, 60vh, 580px);
@@ -333,6 +348,24 @@ main {
 
 .product-card .cart-status.hidden {
     display: none;
+}
+
+.product-card .bid-status {
+    font-size: 0.85rem;
+    color: var(--clay);
+    min-width: 160px;
+}
+
+.product-card .bid-status.hidden {
+    display: none;
+}
+
+.product-card .bid-status.success {
+    color: var(--success);
+}
+
+.product-card .bid-status.error {
+    color: var(--error);
 }
 
 .empty-state {

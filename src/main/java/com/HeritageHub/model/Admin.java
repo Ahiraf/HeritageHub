@@ -35,6 +35,9 @@ public class Admin {
 
     private String role;
 
+    @Column(name = "api_key", unique = true)
+    private String apiKey;
+
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Seller> managedSellers = new ArrayList<>();
@@ -89,6 +92,14 @@ public class Admin {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public List<Seller> getManagedSellers() {

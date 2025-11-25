@@ -19,9 +19,9 @@
             <a href="index.html#product-showcase">Products</a>
             <a href="dashboard.html">Dashboard</a>
             <a href="profile.html">Profile</a>
-            <a href="index.html#mission">Our Story</a>
             <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
             <a href="account.html">Account</a>
+            <button type="button" class="nav-signout hidden" data-role-link="ANY" data-action="sign-out">Sign out</button>
         </nav>
     </div>
 </header>
@@ -43,22 +43,28 @@
                 <span class="tag">New members</span>
                 <h2>Create an account</h2>
                 <p>Set up your HeritageHub profile to list crafts, place bids, or purchase artisan products.</p>
+                <p class="muted">Admin access is invitation-only. If you need elevated privileges, please contact an existing administrator.</p>
             </div>
             <form id="register-form" class="stack">
                 <label>Registering as*
                     <select name="role" id="register-role" required>
                         <option value="CONSUMER" selected>Consumer</option>
                         <option value="SELLER">Seller</option>
-                        <option value="ADMIN">Admin</option>
                     </select>
                 </label>
                 <label>Password*
-                    <input type="password" name="password" data-required="CONSUMER SELLER ADMIN" minlength="4">
+                    <input type="password" name="password" data-required="CONSUMER SELLER" minlength="4">
                 </label>
 
                 <div class="field-grid role-section" data-role="CONSUMER">
                     <label>Consumer NID*
                         <input type="text" name="consumerNid" data-required="CONSUMER" placeholder="NID123456">
+                    </label>
+                    <label>First Name
+                        <input type="text" name="consumerFirstName" placeholder="First name">
+                    </label>
+                    <label>Last Name
+                        <input type="text" name="consumerLastName" placeholder="Last name">
                     </label>
                     <label>Full Name*
                         <input type="text" name="consumerName" data-required="CONSUMER" placeholder="Your name">
@@ -128,24 +134,6 @@
                     </label>
                     <label>Business Address
                         <input type="text" name="street" placeholder="Workshop or address">
-                    </label>
-                    <label>Approving Admin ID
-                        <input type="number" name="managerId" min="1" placeholder="Optional admin ID for approval">
-                    </label>
-                </div>
-
-                <div class="field-grid role-section hidden" data-role="ADMIN">
-                    <label>Admin Name*
-                        <input type="text" name="adminName" data-required="ADMIN" placeholder="Full name">
-                    </label>
-                    <label>Email*
-                        <input type="email" name="email" data-required="ADMIN" placeholder="admin@example.com">
-                    </label>
-                    <label>Phone
-                        <input type="tel" name="phoneNumber" placeholder="+8801XXXXXXXXX">
-                    </label>
-                    <label>Role / Title
-                        <input type="text" name="adminRole" placeholder="E.g., Master Curator">
                     </label>
                 </div>
 

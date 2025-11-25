@@ -58,6 +58,9 @@ public class BiddingService {
         if (bidding.getBidDate() == null) {
             bidding.setBidDate(LocalDateTime.now());
         }
+        if (bidding.getBidStatus() == null) {
+            bidding.setBidStatus(BidStatus.PENDING);
+        }
         return biddingRepository.save(bidding);
     }
 

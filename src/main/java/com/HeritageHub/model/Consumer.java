@@ -53,6 +53,9 @@ public class Consumer {
     @Column(name = "code_no")
     private String codeNo;
 
+    @Column(name = "api_key", unique = true)
+    private String apiKey;
+
     @OneToMany(mappedBy = "consumer", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
@@ -191,5 +194,13 @@ public class Consumer {
 
     public void setOrders(List<CustomerOrder> orders) {
         this.orders = orders;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

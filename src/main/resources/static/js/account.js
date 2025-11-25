@@ -14,6 +14,7 @@
     const roleSections = document.querySelectorAll(".role-section");
     const currentYearEl = document.getElementById("current-year");
     const AUTH_EVENTS = ["heritagehubSession", "heritagehubProfile"];
+    const signOutButtons = document.querySelectorAll('[data-action="sign-out"]');
 
     const parseStoredJson = (raw) => {
         if (!raw) return null;
@@ -23,6 +24,20 @@
             console.warn("Failed to parse stored role payload", err);
             return null;
         }
+    };
+
+    const clearAuthState = () => {
+        localStorage.removeItem("heritagehubSession");
+        localStorage.removeItem("heritagehubProfile");
+        localStorage.removeItem("heritagehubCart");
+    };
+
+    const performSignOut = () => {
+        clearAuthState();
+        document.dispatchEvent(new CustomEvent("heritagehub:auth-changed"));
+        updateRoleLinks();
+        prefillRecoveryForms();
+        window.location.href = "account.html";
     };
 
     const getStoredRole = () => {
@@ -90,17 +105,36 @@
     }
 
     const postJson = async (url, data) => {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok) {
-            const errorMessage = payload?.error || payload?.message || response.statusText;
-            throw new Error(errorMessage);
+        const bases = [];
+        const currentOrigin = new URL(window.location.href).origin;
+        bases.push(currentOrigin);
+        if (!currentOrigin.endsWith(":8080")) {
+            bases.push("http://localhost:8080");
+            bases.push("http://127.0.0.1:8080");
         }
-        return payload;
+        let lastError = null;
+        for (const base of bases) {
+            try {
+                const absolute = url.startsWith("http") ? url : `${base}${url}`;
+                const response = await fetch(absolute, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    const errorMessage = payload?.error || payload?.message || response.statusText;
+                    throw new Error(errorMessage);
+                }
+                return payload;
+            } catch (error) {
+                lastError = error;
+            }
+        }
+        if (lastError) {
+            throw lastError;
+        }
+        throw new Error("Unable to reach the authentication service.");
     };
 
     const setFeedback = (element, message, type = "") => {
@@ -133,6 +167,12 @@
         setFeedback(registerFeedback, "");
     });
     toggleRoleSections();
+    signOutButtons.forEach(button => {
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+            performSignOut();
+        });
+    });
 
     forgotPasswordTrigger?.addEventListener("click", () => {
         if (!forgotPasswordPanel) {
@@ -273,7 +313,6 @@
             phoneNumber: getNullable("phoneNumber")
         };
         if (role === "SELLER") {
-            const managerIdRaw = getValue("managerId");
             const sellerPayload = {
                 ...base,
                 sellerNid: getValue("sellerNid") || null,
@@ -287,25 +326,16 @@
                 unionName: getNullable("unionName"),
                 villageName: getNullable("villageName"),
                 codeNo: getNullable("codeNo"),
-                street: getNullable("street"),
-                managerId: managerIdRaw ? Number(managerIdRaw) : null
+                street: getNullable("street")
             };
-            if (sellerPayload.managerId === null) {
-                delete sellerPayload.managerId;
-            }
             return sellerPayload;
-        }
-        if (role === "ADMIN") {
-            return {
-                ...base,
-                adminName: getValue("adminName") || null,
-                adminRole: getNullable("adminRole")
-            };
         }
         // Consumer default
         return {
             ...base,
             consumerNid: getValue("consumerNid") || null,
+            consumerFirstName: getNullable("consumerFirstName"),
+            consumerLastName: getNullable("consumerLastName"),
             consumerName: getNullable("consumerName"),
             street: getNullable("street"),
             streetNo: getNullable("streetNo"),

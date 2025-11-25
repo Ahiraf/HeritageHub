@@ -4,6 +4,7 @@ import com.HeritageHub.model.Admin;
 import com.HeritageHub.model.Seller;
 import com.HeritageHub.repository.AdminRepository;
 import com.HeritageHub.repository.SellerRepository;
+import com.HeritageHub.util.ApiKeyGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +31,14 @@ public class SellerService {
     }
 
     public Seller create(Seller seller, Long managerId) {
+        seller.setApiKey(ApiKeyGenerator.generate());
         if (managerId != null) {
             Admin admin = adminRepository.findById(managerId)
                     .orElseThrow(() -> new IllegalArgumentException("Admin not found: " + managerId));
             seller.setManager(admin);
+            seller.setVerified(Boolean.TRUE);
+        } else {
+            seller.setVerified(Boolean.FALSE);
         }
         return sellerRepository.save(seller);
     }
@@ -55,6 +60,9 @@ public class SellerService {
         existing.setDivisionName(updates.getDivisionName());
         existing.setPostCode(updates.getPostCode());
         existing.setWorkingType(updates.getWorkingType());
+        if (updates.getVerified() != null) {
+            existing.setVerified(updates.getVerified());
+        }
         if (managerId != null) {
             Admin admin = adminRepository.findById(managerId)
                     .orElseThrow(() -> new IllegalArgumentException("Admin not found: " + managerId));
@@ -81,6 +89,7 @@ public class SellerService {
                 .ifPresent(existing -> {
                     throw new IllegalArgumentException("Seller account already exists for email: " + existing.getEmail());
                 });
+        seller.setApiKey(ApiKeyGenerator.generate());
         if (managerId != null) {
             Admin admin = adminRepository.findById(managerId)
                     .orElseThrow(() -> new IllegalArgumentException("Admin not found: " + managerId));
@@ -93,8 +102,24 @@ public class SellerService {
         if (email == null || password == null) {
             throw new IllegalArgumentException("Email and password are required.");
         }
-        return sellerRepository.findByEmailIgnoreCaseAndPassword(email, password)
+        Seller seller = sellerRepository.findByEmailIgnoreCaseAndPassword(email, password)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid credentials."));
+        if (seller.getApiKey() == null || seller.getApiKey().isBlank()) {
+            seller.setApiKey(ApiKeyGenerator.generate());
+            sellerRepository.save(seller);
+        }
+        return seller;
+    }
+
+    public Seller verifySeller(String sellerNid, Long adminId, boolean verified) {
+        Seller seller = findById(sellerNid);
+        if (adminId != null) {
+            Admin admin = adminRepository.findById(adminId)
+                    .orElseThrow(() -> new IllegalArgumentException("Admin not found: " + adminId));
+            seller.setManager(admin);
+        }
+        seller.setVerified(verified);
+        return sellerRepository.save(seller);
     }
 
     public Seller findByEmail(String email) {
@@ -103,6 +128,10 @@ public class SellerService {
         }
         return sellerRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new IllegalArgumentException("Seller not found for email: " + email));
+    }
+
+    public List<Seller> findByVerified(Boolean verified) {
+        return sellerRepository.findByVerified(verified);
     }
 
     public void updatePassword(String email, String newPassword) {

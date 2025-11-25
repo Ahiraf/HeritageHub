@@ -1,6 +1,7 @@
 package com.HeritageHub.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -66,8 +67,15 @@ public class Seller {
     @Column(name = "working_type")
     private String workingType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "is_verified")
+    private Boolean verified = Boolean.FALSE;
+
+    @Column(name = "api_key", unique = true)
+    private String apiKey;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "admin_id")
+    @JsonIgnoreProperties({"managedSellers", "approvedProducts", "password"})
     private Admin manager;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
@@ -200,6 +208,22 @@ public class Seller {
 
     public void setWorkingType(String workingType) {
         this.workingType = workingType;
+    }
+
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     public Admin getManager() {

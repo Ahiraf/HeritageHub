@@ -9,7 +9,15 @@ Spring Boot project that implements the HeritageHub marketplace described by the
 
 ## Getting Started
 1. By default the app uses an in-memory H2 database so you can run it without any external setup. Simply start the app (see step 3) and browse to the H2 console at `/h2-console` if you want to inspect data.
-2. To run against MySQL instead, update `src/main/resources/application-mysql.properties` with your credentials and start the app with the profile flag `--spring.profiles.active=mysql` (or set `SPRING_PROFILES_ACTIVE=mysql`). Seed admins/sellers/consumers directly in MySQL or via the REST API before creating dependent entities like products and orders.
+2. To run against MySQL Workbench instead of H2:
+   - Create a schema (e.g., `heritagehub`) in MySQL Workbench.
+   - Optionally set the environment variables `MYSQL_USER` / `MYSQL_PASSWORD` (otherwise the defaults `root` / empty string are used).
+   - Start the app with the MySQL profile: `./mvnw spring-boot:run -Dspring-boot.run.profiles=mysql` (or set `SPRING_PROFILES_ACTIVE=mysql`). The schema will be created/updated automatically (`ddl-auto=update`).
+   - Inspect or edit tables directly from MySQL Workbench.
+3. API authentication
+   - Every account now receives an API key that must be supplied with requests (header `X-API-KEY`).
+   - The key is returned from `/auth/register` and `/auth/login`; the front-end stores it in `localStorage`.
+   - Admin accounts cannot be self-registered; create them internally or promote an account via the admin dashboard/back-end.
 3. Build and run:
    ```bash
    mvn clean package
@@ -36,9 +44,9 @@ Spring Boot project that implements the HeritageHub marketplace described by the
 All POST/PUT requests accept/return JSON. Relationships are wired by query parameters such as `sellerNid`, `productId`, and `consumerNid` to keep payloads lightweight.
 
 ## Front-End Dashboard
-`src/main/resources/static/index.html` provides a minimal UI to:
-- Visualise the product catalogue (landing page focused on browsing).
-- Access `seller.html`, `orders.html`, `reviews.html`, and `bids.html` for product creation, order logging, review submissions, and bid management respectively.
+-`src/main/resources/static/index.html` provides a minimal UI to:
+  - Visualise the product catalogue (landing page focused on browsing).
+  - Access `seller.html`, `orders.html`, and `reviews.html` for product creation, order logging, review submissions, and integrated product bidding.
 - Open `profile.html` to review the information captured during account registration.
 
 The styles (`css/style.css`) and behaviour (`js/app.js`) are plain CSS/JS to keep dependencies minimal.

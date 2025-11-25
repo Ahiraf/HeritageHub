@@ -22,8 +22,8 @@
             <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
             <a href="orders.html">Orders</a>
             <a href="reviews.html">Reviews</a>
-            <a href="bids.html">Bids</a>
             <a href="account.html">Account</a>
+            <button type="button" class="nav-signout hidden" data-role-link="ANY" data-action="sign-out">Sign out</button>
         </nav>
     </div>
 </header>
@@ -61,12 +61,27 @@
                 <label>Delivery Charge
                     <input type="number" step="0.01" name="deliveryCharge">
                 </label>
+            </div>
+            <div class="field-grid">
+                <label>Payment Medium*
+                    <select name="transactionMedium" required>
+                        <option value="BKASH">Bkash</option>
+                        <option value="CASH">Cash on delivery</option>
+                    </select>
+                </label>
+                <label>Transaction Amount*
+                    <input type="number" step="0.01" name="transactionAmount" required>
+                </label>
+                <label>Transaction Reference
+                    <input type="text" name="transactionReference" placeholder="Bkash transaction ID or note">
+                </label>
                 <label>Total Price*
                     <input type="number" step="0.01" name="totalPrice" required>
                 </label>
             </div>
             <button type="submit" class="btn primary">Submit Order</button>
             <p class="form-feedback" id="order-feedback"></p>
+            <p id="bkash-payment-summary" class="auth-feedback hidden"></p>
         </form>
     </article>
 </main>
@@ -78,5 +93,6 @@
 </footer>
 
 <script src="js/app.js" defer></script>
+<script src="js/order-payment.js" defer></script>
 </body>
 </html>

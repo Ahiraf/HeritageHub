@@ -54,7 +54,8 @@ public class ProductService {
         if (product.getBiddable() == null) {
             product.setBiddable(Boolean.FALSE);
         }
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+        return findById(saved.getId());
     }
 
     public Product update(Long id, Product updates, String sellerNid, Long approvedById) {
@@ -84,7 +85,8 @@ public class ProductService {
                     .orElseThrow(() -> new IllegalArgumentException("Admin not found: " + approvedById));
             existing.setApprovedBy(admin);
         }
-        return productRepository.save(existing);
+        productRepository.save(existing);
+        return findById(existing.getId());
     }
 
     public void delete(Long id) {

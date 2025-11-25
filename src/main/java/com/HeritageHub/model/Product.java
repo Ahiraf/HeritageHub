@@ -1,6 +1,7 @@
 package com.HeritageHub.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,10 +29,12 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_nid")
+    @JsonIgnoreProperties({"managedSellers", "approvedProducts", "password"})
     private Seller seller;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "approved_by")
+    @JsonIgnoreProperties({"managedSellers", "approvedProducts", "password"})
     private Admin approvedBy;
 
     @Column(name = "product_name", nullable = false)
@@ -69,7 +72,7 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "upload_image")
+    @Column(name = "upload_image", columnDefinition = "LONGTEXT")
     private String uploadImage;
 
     @Column(name = "date_added")

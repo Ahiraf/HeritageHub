@@ -21,6 +21,19 @@
     const CART_STORAGE_KEY = "heritagehubCart";
     const AUTH_EVENTS = ["heritagehubSession", "heritagehubProfile"];
     const productCache = new Map();
+    const signOutButtons = document.querySelectorAll('[data-action="sign-out"]');
+
+    const clearAuthState = () => {
+        localStorage.removeItem("heritagehubSession");
+        localStorage.removeItem("heritagehubProfile");
+        localStorage.removeItem(CART_STORAGE_KEY);
+    };
+
+    const performSignOut = () => {
+        clearAuthState();
+        document.dispatchEvent(new CustomEvent("heritagehub:auth-changed"));
+        window.location.href = "account.html";
+    };
 
     const normalizeCartItems = (items = []) => {
         if (!Array.isArray(items)) {
@@ -58,12 +71,13 @@
         }
     };
 
+    const getStoredProfile = () => {
+        return parseStoredJson(localStorage.getItem("heritagehubProfile"))
+            ?? parseStoredJson(localStorage.getItem("heritagehubSession"));
+    };
+
     const getStoredRole = () => {
-        const session = parseStoredJson(localStorage.getItem("heritagehubSession"));
-        if (session?.role) {
-            return session.role.toString().toUpperCase();
-        }
-        const profile = parseStoredJson(localStorage.getItem("heritagehubProfile"));
+        const profile = getStoredProfile();
         if (profile?.role) {
             return profile.role.toString().toUpperCase();
         }
@@ -86,7 +100,6 @@
 
     updateRoleLinks();
     document.addEventListener("heritagehub:auth-changed", updateRoleLinks);
-    document.addEventListener("heritagehub:cart-updated", refreshProductCartBadges);
     window.addEventListener("storage", (event) => {
         if (AUTH_EVENTS.includes(event.key)) {
             updateRoleLinks();
@@ -124,7 +137,7 @@
             craftType: "Jute Weaving",
             materialType: "Jute & Cotton",
             color: "Natural Beige",
-            productPrice: 32.0,
+            productPrice: 500.0,
             inStock: 18,
             biddable: false,
             weight: "450g",
@@ -140,7 +153,7 @@
             craftType: "Bamboo Weaving",
             materialType: "Bamboo",
             color: "Warm Brown",
-            productPrice: 22.0,
+            productPrice: 350.0,
             inStock: 30,
             biddable: true,
             weight: "350g",
@@ -156,7 +169,7 @@
             craftType: "Terracotta",
             materialType: "Earthen Clay",
             color: "Terracotta Red",
-            productPrice: 28.5,
+            productPrice: 900.0,
             inStock: 24,
             biddable: false,
             weight: "1.2kg",
@@ -172,7 +185,7 @@
             craftType: "Handloom Weaving",
             materialType: "Organic Cotton",
             color: "Crimson & Gold",
-            productPrice: 78.0,
+            productPrice: 4000.0,
             inStock: 12,
             biddable: false,
             weight: "650g",
@@ -188,7 +201,7 @@
             craftType: "Kantha Stitching",
             materialType: "Recycled Cotton",
             color: "Multicolor",
-            productPrice: 64.0,
+            productPrice: 7000.0,
             inStock: 15,
             biddable: false,
             weight: "900g",
@@ -204,7 +217,7 @@
             craftType: "Metal Filigree",
             materialType: "Polished Brass",
             color: "Antique Gold",
-            productPrice: 48.0,
+            productPrice: 2000.0,
             inStock: 20,
             biddable: true,
             weight: "200g",
@@ -220,7 +233,7 @@
             craftType: "Hand Embroidery",
             materialType: "Cotton Canvas",
             color: "Ivory & Indigo",
-            productPrice: 18.0,
+            productPrice: 950.0,
             inStock: 40,
             biddable: false,
             weight: "180g",
@@ -236,7 +249,7 @@
             craftType: "Kantha Stitching",
             materialType: "Handloom Cotton",
             color: "Earth Tones",
-            productPrice: 120.0,
+            productPrice: 3000.0,
             inStock: 8,
             biddable: false,
             weight: "1.8kg",
@@ -342,16 +355,95 @@
         saveCart(cart);
         updateCardCartState(card, product);
         showFeedback(productFeedback, `${name} added to cart.`, "success");
+        if (product.biddable && typeof product.id === "number") {
+            setTimeout(() => {
+                const wantsBid = window.confirm("Do you want to place a bid on this product?");
+                if (wantsBid) {
+                    window.location.href = `place-bid.html?productId=${product.id}`;
+                }
+            }, 100);
+        }
+    };
+
+    const handleProductBid = async (product, statusEl) => {
+        if (!statusEl || !product || typeof product.id !== "number") {
+            return;
+        }
+        const productName = product.productName ?? "this product";
+        let consumerNid = getStoredProfile()?.consumerNid ?? null;
+        if (!consumerNid) {
+            consumerNid = window.prompt("Enter your consumer NID to place a bid:");
+            if (!consumerNid) {
+                return;
+            }
+        }
+        const amountInput = window.prompt(`Enter your bid amount for ${productName} (Tk):`);
+        const amount = Number(amountInput);
+        statusEl.className = "bid-status";
+        statusEl.classList.remove("hidden");
+        if (!amountInput || Number.isNaN(amount) || amount <= 0) {
+            statusEl.textContent = "Invalid bid amount.";
+            statusEl.classList.add("error");
+            return;
+        }
+        try {
+            const params = new URLSearchParams({
+                consumerNid: consumerNid.trim(),
+                productId: product.id.toString()
+            });
+            await fetchJson(`/api/bids?${params.toString()}`, {
+                method: "POST",
+                body: JSON.stringify({ bidAmount: amount })
+            });
+            statusEl.textContent = `Bid placed: Tk ${amount.toFixed(2)}.`;
+            statusEl.classList.add("success");
+        } catch (error) {
+            statusEl.textContent = error.message;
+            statusEl.classList.remove("success");
+            statusEl.classList.add("error");
+        }
+    };
+
+    const fetchWithFallback = async (url, options = {}) => {
+        const bases = [];
+        const sameOrigin = new URL(window.location.href).origin;
+        bases.push(sameOrigin);
+        if (!sameOrigin.endsWith(":8080")) {
+            bases.push("http://localhost:8080");
+        }
+        if (!sameOrigin.endsWith(":8080") && !sameOrigin.endsWith(":8081")) {
+            bases.push("http://127.0.0.1:8080");
+        }
+        const errors = [];
+        for (const base of bases) {
+            try {
+                const absolute = url.startsWith("http") ? url : `${base}${url}`;
+                const profile = getStoredProfile();
+                const apiKey = profile?.apiKey;
+                const headers = {
+                    "Content-Type": "application/json",
+                    ...(options.headers || {})
+                };
+                if (apiKey) {
+                    headers["X-API-KEY"] = apiKey;
+                }
+                const response = await fetch(absolute, {
+                    ...options,
+                    headers
+                });
+                return { response, base: absolute };
+            } catch (err) {
+                errors.push(err);
+            }
+        }
+        if (errors.length) {
+            throw errors[0];
+        }
+        throw new Error("Unable to reach API");
     };
 
     const fetchJson = async (url, options = {}) => {
-        const response = await fetch(url, {
-            headers: {
-                "Content-Type": "application/json",
-                ...(options.headers || {})
-            },
-            ...options
-        });
+        const { response } = await fetchWithFallback(url, options);
         const text = await response.text();
         let data = null;
         if (text) {
@@ -440,7 +532,12 @@
             const stockText = document.createElement("span");
             stockText.textContent = `In stock: ${product.inStock ?? "N/A"}`;
             const sellerText = document.createElement("span");
-            const sellerName = product.seller?.sellerNid ?? product.seller?.name ?? product.sellerName ?? product.seller ?? "Unknown";
+            const sellerName = product.sellerNid
+                ?? product.seller?.sellerNid
+                ?? product.sellerName
+                ?? product.seller?.sellerName
+                ?? product.seller
+                ?? "Unknown";
             sellerText.textContent = `Seller: ${sellerName}`;
             footer.appendChild(stockText);
             footer.appendChild(sellerText);
@@ -457,8 +554,20 @@
             const status = document.createElement("span");
             status.className = "cart-status hidden";
             actions.appendChild(status);
-            card.appendChild(actions);
 
+            if (typeof product.id === "number" && product.biddable) {
+                const bidButton = document.createElement("button");
+                bidButton.className = "btn ghost";
+                bidButton.type = "button";
+                bidButton.textContent = "Place Bid";
+                const bidStatus = document.createElement("span");
+                bidStatus.className = "bid-status hidden";
+                bidButton.addEventListener("click", () => handleProductBid(product, bidStatus));
+                actions.appendChild(bidButton);
+                actions.appendChild(bidStatus);
+            }
+
+            card.appendChild(actions);
             productGridEl.appendChild(card);
             updateCardCartState(card, product);
         });
@@ -468,6 +577,7 @@
         if (!productGridEl) {
             return;
         }
+        renderProducts(staticProducts);
         try {
             const products = await fetchJson("/api/products");
             const combined = Array.isArray(products) && products.length > 0
@@ -577,12 +687,24 @@
             return;
         }
 
+        const medium = formData.get("transactionMedium")?.toString().trim();
+        const transactionAmount = formData.get("transactionAmount") ? Number(formData.get("transactionAmount")) : null;
+        const transactionReference = formData.get("transactionReference")?.toString().trim() || null;
+
+        if (!medium || !transactionAmount || Number.isNaN(transactionAmount)) {
+            showFeedback(orderFeedback, "Payment medium and amount are required.", "error");
+            return;
+        }
+
         const payload = {
             productWeight: formData.get("productWeight") || null,
             productQuantity: formData.get("productQuantity") ? Number(formData.get("productQuantity")) : null,
             totalPrice: formData.get("totalPrice") ? Number(formData.get("totalPrice")) : null,
             orderType: formData.get("orderType") || null,
-            deliveryCharge: formData.get("deliveryCharge") ? Number(formData.get("deliveryCharge")) : null
+            deliveryCharge: formData.get("deliveryCharge") ? Number(formData.get("deliveryCharge")) : null,
+            transactionMedium: medium,
+            transactionAmount,
+            transactionReference
         };
 
         const params = new URLSearchParams({
@@ -591,10 +713,20 @@
         });
 
         try {
-            await fetchJson(`/api/orders?${params.toString()}`, {
+            const orderResponse = await fetchJson(`/api/orders?${params.toString()}`, {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
+            if (orderResponse?.id) {
+                await fetchJson(`/api/transactions?orderId=${orderResponse.id}`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        transactionMedium: payload.transactionMedium,
+                        amount: payload.transactionAmount,
+                        reference: payload.transactionReference
+                    })
+                });
+            }
             showFeedback(orderFeedback, "Order created successfully.", "success");
             orderForm.reset();
         } catch (error) {
@@ -670,6 +802,13 @@
     });
 
     refreshProductsBtn?.addEventListener("click", loadProducts);
+    document.addEventListener("heritagehub:cart-updated", refreshProductCartBadges);
+    signOutButtons.forEach(button => {
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+            performSignOut();
+        });
+    });
 
     if (currentYearEl) {
         currentYearEl.textContent = new Date().getFullYear();

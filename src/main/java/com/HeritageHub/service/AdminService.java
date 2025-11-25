@@ -2,6 +2,7 @@ package com.HeritageHub.service;
 
 import com.HeritageHub.model.Admin;
 import com.HeritageHub.repository.AdminRepository;
+import com.HeritageHub.util.ApiKeyGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,9 @@ public class AdminService {
     }
 
     public Admin create(Admin admin) {
+        if (admin.getApiKey() == null || admin.getApiKey().isBlank()) {
+            admin.setApiKey(ApiKeyGenerator.generate());
+        }
         return adminRepository.save(admin);
     }
 
@@ -40,6 +44,7 @@ public class AdminService {
                 .ifPresent(existing -> {
                     throw new IllegalArgumentException("Admin account already exists for email: " + existing.getEmail());
                 });
+        admin.setApiKey(ApiKeyGenerator.generate());
         return adminRepository.save(admin);
     }
 
@@ -47,8 +52,13 @@ public class AdminService {
         if (email == null || password == null) {
             throw new IllegalArgumentException("Email and password are required.");
         }
-        return adminRepository.findByEmailIgnoreCaseAndPassword(email, password)
+        Admin admin = adminRepository.findByEmailIgnoreCaseAndPassword(email, password)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid credentials."));
+        if (admin.getApiKey() == null || admin.getApiKey().isBlank()) {
+            admin.setApiKey(ApiKeyGenerator.generate());
+            adminRepository.save(admin);
+        }
+        return admin;
     }
 
     public Admin findByEmail(String email) {

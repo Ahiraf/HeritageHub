@@ -2,6 +2,7 @@ package com.HeritageHub.service;
 
 import com.HeritageHub.model.Consumer;
 import com.HeritageHub.repository.ConsumerRepository;
+import com.HeritageHub.util.ApiKeyGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ public class ConsumerService {
                 .ifPresent(existing -> {
                     throw new IllegalArgumentException("An account already exists for email: " + existing.getEmail());
                 });
+        consumer.setApiKey(ApiKeyGenerator.generate());
         return consumerRepository.save(consumer);
     }
 
@@ -47,8 +49,13 @@ public class ConsumerService {
         if (email == null || password == null) {
             throw new IllegalArgumentException("Email and password are required.");
         }
-        return consumerRepository.findByEmailIgnoreCaseAndPassword(email, password)
+        Consumer consumer = consumerRepository.findByEmailIgnoreCaseAndPassword(email, password)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid credentials."));
+        if (consumer.getApiKey() == null || consumer.getApiKey().isBlank()) {
+            consumer.setApiKey(ApiKeyGenerator.generate());
+            consumerRepository.save(consumer);
+        }
+        return consumer;
     }
 
     public Consumer findByEmail(String email) {

@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ConsumerRepository extends JpaRepository<Consumer, String> {
     Optional<Consumer> findByEmailIgnoreCase(String email);
     Optional<Consumer> findByEmailIgnoreCaseAndPassword(String email, String password);
+    Optional<Consumer> findByApiKey(String apiKey);
 }

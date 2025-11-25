@@ -22,8 +22,8 @@
             <a href="seller.html" class="hidden seller-link" data-role-link="SELLER">Seller Page</a>
             <a href="orders.html">Orders</a>
             <a href="reviews.html">Reviews</a>
-            <a href="bids.html">Bids</a>
             <a href="account.html">Account</a>
+            <button type="button" class="nav-signout hidden" data-role-link="ANY" data-action="sign-out">Sign out</button>
         </nav>
     </div>
 </header>
@@ -141,6 +141,18 @@
                     <li>Open complaints: <span data-stat="complaints-open">0</span></li>
                 </ul>
                 <button class="btn ghost" data-action="manage-complaints">Manage Complaints</button>
+            </article>
+            <article class="dashboard-card">
+                <h3>Price Monitor</h3>
+                <div class="dashboard-list" data-list="price-monitor">
+                    <p class="empty-state">Prices will appear once products are available.</p>
+                </div>
+            </article>
+            <article class="dashboard-card">
+                <h3>Review Watch</h3>
+                <div class="dashboard-list" data-list="review-monitor">
+                    <p class="empty-state">Recent reviews will appear here.</p>
+                </div>
             </article>
             <article class="dashboard-card dashboard-card--wide">
                 <h3>System Analytics</h3>
